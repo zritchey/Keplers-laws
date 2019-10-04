@@ -1,0 +1,51 @@
+l1,l2,v2,a,b,T=np.loadtxt("orbits.txt",unpack=True,skiprows=1,usecols=(1,2,4,5,6,7))
+
+# Encke's comet
+l1=np.append(l1,0.3302)
+l2=np.append(l2,4.11)
+a=np.append(a,2.2178)
+b=np.append(b,1.17861)
+v2=np.append(v2,1.2109)
+
+def ellipse1(i,t):    #different for each planet i
+
+    global r
+    global d
+    global off
+    global c
+    if t==0:
+        off=a[i]-l1[i]
+        c=(v2[i])*l2[i]
+        d=l2[i]
+        r=a[i]
+    w=c/(r*d)
+    x=a[i]*np.cos(w*t)+off
+    y=b[i]*np.sin(w*t)
+    
+    d=np.sqrt((x**2)+(y**2))
+    r=np.sqrt(((x-off)**2)+(y**2))
+    
+   # print(w,c,d,r)
+    return x,y
+
+c1=1e-3
+back = plt.Rectangle((-250,-250),width=500, height=500, color='black')
+csun=1e-6   #factor for the sun radius
+sun = plt.Circle((0,0),69550*csun, color = 'yellow')
+halley = plt.Circle((a[8],0),100*c1, color = 'cyan')
+fig= plt.figure(figsize=[10,8])
+plt.axis("scaled")
+plt.xlim(-1,5)
+plt.ylim(-2,2)
+ax = plt.gca()
+ax.add_patch(back)
+ax.add_patch(sun)
+ax.add_patch(halley)
+def animate(frame):
+    halley.center=(ellipse1(8,frame/150))
+
+anim=FuncAnimation(fig, animate, frames=200, interval=30)
+video= anim.to_html5_video()
+html = display.HTML(video)
+display.display(html)
+plt.close()
